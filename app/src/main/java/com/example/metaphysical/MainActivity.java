@@ -27,8 +27,6 @@ public class MainActivity extends AppCompatActivity {
     private PointerDrawable pointer = new PointerDrawable();
     private boolean isTracking;
     private boolean isHitting;
-    private static final String TAG = "Req..";
-    private static final double MIN_OPENGL_VERSION = 3.0;
 
 
     @Override
@@ -45,6 +43,11 @@ public class MainActivity extends AppCompatActivity {
         initializeGallery();
     }
 
+
+    /**
+     * This method updates the tracking state.
+     * Detects when user hits a plane and enables the pointer accordingly
+     */
     private void onUpdate() {
         boolean trackingChanged = updateTracking();
         View contentView = findViewById(android.R.id.content);
@@ -65,6 +68,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This method returns true if the tracking state has changed
+     * Determined by the ARCore's camera state.
+     *
+     * @return
+     */
     private boolean updateTracking() {
         Frame frame = fragment.getArSceneView().getArFrame();
         boolean wasTracking = isTracking;
@@ -73,6 +82,12 @@ public class MainActivity extends AppCompatActivity {
         return isTracking != wasTracking;
     }
 
+    /**
+     * This method calls Frame.hitTest() upon detecting a hit.
+     * Also calls getScreenCenter() as we need the center of the screen.
+     *
+     * @return
+     */
     private boolean updateHitTest() {
         Frame frame = fragment.getArSceneView().getArFrame();
         android.graphics.Point pt = getScreenCenter();
@@ -127,8 +142,8 @@ public class MainActivity extends AppCompatActivity {
 
         ImageView morty = new ImageView(this);
         morty.setImageResource(R.drawable.morty_thumb);
-        morty.setContentDescription("igloo");
-        morty.setOnClickListener(view -> addsfbObject(Uri.parse("model.sfb")));
+        morty.setContentDescription("morty");
+        morty.setOnClickListener(view -> addsfbObject(Uri.parse("morty.sfb")));
         gallery.addView(morty);
 
     }

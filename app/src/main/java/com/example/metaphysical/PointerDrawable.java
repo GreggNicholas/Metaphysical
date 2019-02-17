@@ -23,8 +23,8 @@ public class PointerDrawable extends Drawable {
 
     @Override
     public void draw(@NonNull Canvas canvas) {
-float cx = canvas.getWidth()/2;
-        float cy = canvas.getHeight()/2;
+        float cx = canvas.getWidth() / 2;
+        float cy = canvas.getHeight() / 2;
         if (enabled) {
             paint.setColor(Color.GREEN);
             canvas.drawCircle(cx, cy, 10, paint);
@@ -40,7 +40,7 @@ float cx = canvas.getWidth()/2;
     }
 
     @Override
-    public void setColorFilter( ColorFilter colorFilter) {
+    public void setColorFilter(ColorFilter colorFilter) {
 
     }
 

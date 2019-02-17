@@ -54,7 +54,10 @@ sceneform.asset('sampledata/models/igloo.obj',
         'sampledata/models/igloo.sfa',
         'src/main/assets/igloo')
 
-sceneform.asset('sampledata/models/model.obj',
+
+
+
+sceneform.asset('sampledata/models/morty.obj',
         'default',
-        'sampledata/models/model.sfa',
-        'src/main/assets/model')
+        'sampledata/models/morty.sfa',
+        'src/main/assets/morty')
