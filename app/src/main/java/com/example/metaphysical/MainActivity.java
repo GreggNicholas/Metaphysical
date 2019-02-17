@@ -1,19 +1,12 @@
 package com.example.metaphysical;
 
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.net.Uri;
-import android.nfc.Tag;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
@@ -132,6 +125,12 @@ public class MainActivity extends AppCompatActivity {
         igloo.setOnClickListener(view -> addsfbObject(Uri.parse("igloo.sfb")));
         gallery.addView(igloo);
 
+        ImageView morty = new ImageView(this);
+        morty.setImageResource(R.drawable.morty_thumb);
+        morty.setContentDescription("igloo");
+        morty.setOnClickListener(view -> addsfbObject(Uri.parse("model.sfb")));
+        gallery.addView(morty);
+
     }
 
     /**
@@ -192,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
      * First node is of type AnchorNode(based on the pose of the sfb object, they stay positioned in the smaple place relative to the real world)
      * Second node is a TransformableNode(Handles the interaction of moving, scaling, and rotation based on user gestures)
      * Upon nodes being connected to each other, connect Anchornode to the scene and select a node for interactions.
+     *
      * @param fragment
      * @param anchor
      * @param renderable
