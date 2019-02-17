@@ -2,6 +2,7 @@ package com.example.metaphysical;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.nfc.Tag;
@@ -20,9 +21,13 @@ import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
+import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
+import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class MainActivity extends AppCompatActivity {
     private ArFragment fragment;
@@ -44,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
             fragment.onUpdate(frameTime);
             onUpdate();
         });
+        initializeGallery();
     }
 
     private void onUpdate() {
@@ -128,17 +134,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * This method is called when the thumbnail is click.
+     * Determines where the sfb object should be placed by performing hittest.
+     * Then calles the placeObject method to place the object.
+     *
+     * @param model the sfb Object
+     */
     private void addsfbObject(Uri model) {
         Frame frame = fragment.getArSceneView().getArFrame();
         android.graphics.Point pt = getScreenCenter();
         List<HitResult> hits;
-        if (frame != null){
-            hits = frame.hitTest(pt.x,pt.y);
-            for (HitResult hit: hits){
+        if (frame != null) {
+            hits = frame.hitTest(pt.x, pt.y);
+            for (HitResult hit : hits) {
                 Trackable trackable = hit.getTrackable();
-                if (trackable instanceof  Plane &&
-                        ((Plane)  trackable).isPoseInPolygon(hit.getHitPose())){
-                    placeObject(fragment,hit.createAnchor(), model);
+                if (trackable instanceof Plane &&
+                        ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
+                    placeObject(fragment, hit.createAnchor(), model);
                     break;
                 }
             }
@@ -146,7 +159,52 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    /**
+     * This method uses the ARCore anchor from the hitTest & builds Sceneform nodes
+     * Performs asynchronous loading of the 3D model using the ModelRenderable builder.
+     * Once the model is loaded as a Renderable, call addNodeToScene
+     *
+     * @param fragment
+     * @param anchor
+     * @param model
+     */
+
     private void placeObject(ArFragment fragment, Anchor anchor, Uri model) {
+        CompletableFuture<Void> completableFuture =
+                ModelRenderable.builder()
+                        .setSource(fragment.getContext(), model)
+                        .build()
+                        .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable))
+                        .exceptionally((throwable -> {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                            builder.setMessage(throwable.getMessage())
+                                    .setTitle("Error Rendering Model!");
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                            return null;
+                        }));
+
+    }
+
+    /**
+     * This method builds two nodes and attaches to the sfb Object
+     * First node is of type AnchorNode(based on the pose of the sfb object, they stay positioned in the smaple place relative to the real world)
+     * Second node is a TransformableNode(Handles the interaction of moving, scaling, and rotation based on user gestures)
+     * Upon nodes being connected to each other, connect Anchornode to the scene and select a node for interactions.
+     * @param fragment
+     * @param anchor
+     * @param renderable
+     */
+
+    private void addNodeToScene(ArFragment fragment, Anchor anchor, ModelRenderable renderable) {
+        AnchorNode anchorNode = new AnchorNode(anchor);
+        TransformableNode node = new TransformableNode(fragment.getTransformationSystem());
+        node.setRenderable(renderable);
+        node.setParent(anchorNode);
+        fragment.getArSceneView().getScene().addChild(anchorNode);
+        node.select();
+
     }
 
 }
